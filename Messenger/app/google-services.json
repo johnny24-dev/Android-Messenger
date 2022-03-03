@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "351583491295",
+    "project_id": "messenger-9715a",
+    "storage_bucket": "messenger-9715a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:351583491295:android:18a7f4406db035aa63c56a",
+        "android_client_info": {
+          "package_name": "com.ptit.messenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "351583491295-qc4brja73lr0b02bfrdlc4lvhrkuipi4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_vBCorpPrwSzcQYqnvHnXduLPXMeDvmY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "351583491295-qc4brja73lr0b02bfrdlc4lvhrkuipi4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

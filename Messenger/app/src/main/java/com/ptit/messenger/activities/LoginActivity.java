@@ -22,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText txtEmail;
     private EditText txtPassword;
     private Button btnLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,14 +37,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String email = txtEmail.getText().toString();
                 String password = txtPassword.getText().toString();
-                mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                        if (task.isSuccessful()) {
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                             finish();
-                        }else {
-                            Toast.makeText(getApplicationContext(),"Sai tài khoản hoặc mật khẩu!",Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -58,14 +59,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null){
-            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        if (currentUser != null) {
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }
     }
 
-    public void signUp(View v){
-        Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
+    public void signUp(View v) {
+        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
         startActivity(intent);
         finish();
     }

@@ -28,7 +28,7 @@ public class MessageApdapter extends RecyclerView.Adapter {
     FirebaseAuth mAuth;
     FirebaseDatabase db;
     final int ITEM_SENT = 1;
-    final  int ITEM_RECEIVE = 2;
+    final int ITEM_RECEIVE = 2;
 
     public MessageApdapter(Context context, ArrayList<Message> messages, String receiverAvatar) {
         this.context = context;
@@ -40,7 +40,7 @@ public class MessageApdapter extends RecyclerView.Adapter {
         db.getReference().child("Users").child(currentId).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                     senderAvatar = dataSnapshot.child("profileImage").getValue(String.class);
+                senderAvatar = dataSnapshot.child("profileImage").getValue(String.class);
             }
         });
 
@@ -49,11 +49,11 @@ public class MessageApdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == ITEM_SENT){
-            View view = LayoutInflater.from(context).inflate(R.layout.item_send,parent,false);
+        if (viewType == ITEM_SENT) {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_send, parent, false);
             return new SentViewHolder(view);
-        }else {
-            View view = LayoutInflater.from(context).inflate(R.layout.item_receive,parent,false);
+        } else {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_receive, parent, false);
             return new ReceiverViewHolder(view);
         }
 
@@ -62,9 +62,9 @@ public class MessageApdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Message message = messages.get(position);
-        if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(message.getSenderId())){
+        if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(message.getSenderId())) {
             return ITEM_SENT;
-        }else {
+        } else {
             return ITEM_RECEIVE;
         }
     }
@@ -72,10 +72,10 @@ public class MessageApdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
-        if (holder.getClass() == SentViewHolder.class){
+        if (holder.getClass() == SentViewHolder.class) {
             SentViewHolder sentViewHolder = (SentViewHolder) holder;
 
-            if (message.getMessage().equals("send the photo...")){
+            if (message.getMessage().equals("send the photo...")) {
                 sentViewHolder.image_send.setVisibility(View.VISIBLE);
                 sentViewHolder.tvSentMessage.setVisibility(View.GONE);
                 Glide.with(context).
@@ -86,10 +86,10 @@ public class MessageApdapter extends RecyclerView.Adapter {
 
             sentViewHolder.tvSentMessage.setText(message.getMessage());
             Glide.with(context).load(senderAvatar).placeholder(R.drawable.user_default).into(sentViewHolder.avatar_sender);
-        }else {
+        } else {
             ReceiverViewHolder receiverViewHolder = (ReceiverViewHolder) holder;
 
-            if (message.getMessage().equals("send the photo...")){
+            if (message.getMessage().equals("send the photo...")) {
                 receiverViewHolder.image_receive.setVisibility(View.VISIBLE);
                 receiverViewHolder.tvReceiveMessage.setVisibility(View.GONE);
                 Glide.with(context).
@@ -112,6 +112,7 @@ public class MessageApdapter extends RecyclerView.Adapter {
         private TextView tvSentMessage;
         private ImageView avatar_sender;
         private ImageView image_send;
+
         public SentViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSentMessage = itemView.findViewById(R.id.tvMessageSend);
@@ -124,6 +125,7 @@ public class MessageApdapter extends RecyclerView.Adapter {
         private TextView tvReceiveMessage;
         private ImageView avatar_receiver;
         private ImageView image_receive;
+
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             tvReceiveMessage = itemView.findViewById(R.id.tvMessageRecive);

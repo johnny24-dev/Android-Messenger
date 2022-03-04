@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,20 +28,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> implements Filterable {
 
     Context context;
     ArrayList<User> users;
+    ArrayList<User> usersold;
 
-    public UsersAdapter(Context context, ArrayList<User> users){
+    public UsersAdapter(Context context, ArrayList<User> users) {
         this.context = context;
         this.users = users;
+        this.usersold = users;
     }
 
     @NonNull
     @Override
     public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.row_conversations,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.row_conversations, parent, false);
         return new UsersViewHolder(view);
     }
 
@@ -47,18 +51,18 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
     public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
         User user = users.get(position);
         String currentId = FirebaseAuth.getInstance().getUid();
-        String senderRoom = currentId+user.getUid();
+        String senderRoom = currentId + user.getUid();
         FirebaseDatabase.getInstance("https://messenger-9715a-default-rtdb.asia-southeast1.firebasedatabase.app")
                 .getReference().child("Chats")
                 .child(senderRoom)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
+                        if (snapshot.exists()) {
                             String lastMsg = snapshot.child("lastMsg").getValue(String.class);
                             SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
                             Long time = snapshot.child("lastMsgTime").getValue(Long.class);
-                            if (time != null){
+                            if (time != null) {
                                 holder.tvTime.setText(dateFormat.format(new Date(time)));
                             }
                             holder.tvLastMessage.setText(lastMsg);
@@ -73,15 +77,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
                 });
         holder.tvName.setText(user.getName());
         Glide.with(context).load(user.getProfileImage())
-                    .placeholder(R.drawable.user_default)
-                    .into(holder.avatar);
+                .placeholder(R.drawable.user_default)
+                .into(holder.avatar);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("name",user.getName());
-                intent.putExtra("uid",user.getUid());
-                intent.putExtra("avatar",user.getProfileImage());
+                intent.putExtra("name", user.getName());
+                intent.putExtra("uid", user.getUid());
+                intent.putExtra("avatar", user.getProfileImage());
                 context.startActivity(intent);
             }
         });
@@ -92,11 +96,42 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
         return users.size();
     }
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String txtSearch = charSequence.toString();
+                if (txtSearch.isEmpty()){
+                    users = usersold;
+                }else {
+                    ArrayList<User> listUser = new ArrayList<>();
+                    for (User user: usersold){
+                        if (user.getName().toLowerCase().contains(txtSearch)){
+                            listUser.add(user);
+                        }
+                    }
+                    users = listUser;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = users;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                users = (ArrayList<User>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
     public static class UsersViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvName;
         private final ImageView avatar;
         private final TextView tvLastMessage;
         private final TextView tvTime;
+
         public UsersViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.txtName);

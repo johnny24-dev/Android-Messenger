@@ -59,14 +59,14 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(name_reciver);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.currentId = FirebaseAuth.getInstance().getUid();
-        this.senderRoom = currentId+uid_reciver;
-        this.receiverRoom = uid_reciver+currentId;
+        this.senderRoom = currentId + uid_reciver;
+        this.receiverRoom = uid_reciver + currentId;
         this.receiverAvatar = getIntent().getStringExtra("avatar");
         recyclerView = findViewById(R.id.recyclerviewChat);
         db = FirebaseDatabase.getInstance("https://messenger-9715a-default-rtdb.asia-southeast1.firebasedatabase.app");
         storage = FirebaseStorage.getInstance();
         messages = new ArrayList<>();
-        messageApdapter = new MessageApdapter(this,messages,receiverAvatar);
+        messageApdapter = new MessageApdapter(this, messages, receiverAvatar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(messageApdapter);
 
@@ -77,7 +77,7 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent,25);
+                startActivityForResult(intent, 25);
             }
         });
 
@@ -92,7 +92,6 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
-
         db.getReference().child("Chats")
                 .child(senderRoom)
                 .child("messages")
@@ -100,13 +99,13 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         messages.clear();
-                        for (DataSnapshot snapshot1:snapshot.getChildren()){
+                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                             Message message = snapshot1.getValue(Message.class);
                             messages.add(message);
                         }
                         messageApdapter.notifyDataSetChanged();
-                        if (messages.size() > 0 ){
-                            recyclerView.smoothScrollToPosition(messages.size()-1);
+                        if (messages.size() > 0) {
+                            recyclerView.smoothScrollToPosition(messages.size() - 1);
                         }
                     }
 
@@ -122,11 +121,11 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String messageText = txtMessage.getText().toString();
                 Date date = new Date();
-                Message message = new Message(messageText,currentId,date.getTime());
+                Message message = new Message(messageText, currentId, date.getTime());
                 txtMessage.setText("");
 
                 String randomeKey = db.getReference().push().getKey();
-                if (!messageText.trim().isEmpty()){
+                if (!messageText.trim().isEmpty()) {
                     db.getReference().child("Chats")
                             .child(senderRoom)
                             .child("messages")
@@ -141,9 +140,9 @@ public class ChatActivity extends AppCompatActivity {
                                     .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
-                                    HashMap<String,Object> lastObj = new HashMap<>();
-                                    lastObj.put("lastMsg",message.getMessage());
-                                    lastObj.put("lastMsgTime",date.getTime());
+                                    HashMap<String, Object> lastObj = new HashMap<>();
+                                    lastObj.put("lastMsg", message.getMessage());
+                                    lastObj.put("lastMsgTime", date.getTime());
 
                                     db.getReference().child("Chats").child(senderRoom).updateChildren(lastObj);
                                     db.getReference().child("Chats").child(receiverRoom).updateChildren(lastObj);
@@ -162,52 +161,52 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 25){
-            if (data != null){
-                if (data.getData() != null){
+        if (requestCode == 25) {
+            if (data != null) {
+                if (data.getData() != null) {
                     Uri selectedImage = data.getData();
                     Calendar calendar = Calendar.getInstance();
-                    StorageReference reference = storage.getReference().child("Chats").child(calendar.getTimeInMillis()+"");
+                    StorageReference reference = storage.getReference().child("Chats").child(calendar.getTimeInMillis() + "");
                     reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if (task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
                                         String imageUrl = uri.toString();
                                         String messageText = txtMessage.getText().toString();
                                         Date date = new Date();
-                                        Message message = new Message(messageText,currentId,date.getTime());
+                                        Message message = new Message(messageText, currentId, date.getTime());
                                         message.setImageUrl(imageUrl);
                                         message.setMessage("send the photo...");
                                         txtMessage.setText("");
 
                                         String randomeKey = db.getReference().push().getKey();
-                                            db.getReference().child("Chats")
-                                                    .child(senderRoom)
-                                                    .child("messages")
-                                                    .child(randomeKey)
-                                                    .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    db.getReference().child("Chats")
-                                                            .child(receiverRoom)
-                                                            .child("messages")
-                                                            .child(randomeKey)
-                                                            .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            HashMap<String,Object> lastObj = new HashMap<>();
-                                                            lastObj.put("lastMsg",message.getMessage());
-                                                            lastObj.put("lastMsgTime",date.getTime());
+                                        db.getReference().child("Chats")
+                                                .child(senderRoom)
+                                                .child("messages")
+                                                .child(randomeKey)
+                                                .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                db.getReference().child("Chats")
+                                                        .child(receiverRoom)
+                                                        .child("messages")
+                                                        .child(randomeKey)
+                                                        .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        HashMap<String, Object> lastObj = new HashMap<>();
+                                                        lastObj.put("lastMsg", message.getMessage());
+                                                        lastObj.put("lastMsgTime", date.getTime());
 
-                                                            db.getReference().child("Chats").child(senderRoom).updateChildren(lastObj);
-                                                            db.getReference().child("Chats").child(receiverRoom).updateChildren(lastObj);
-                                                        }
-                                                    });
-                                                }
-                                            });
+                                                        db.getReference().child("Chats").child(senderRoom).updateChildren(lastObj);
+                                                        db.getReference().child("Chats").child(receiverRoom).updateChildren(lastObj);
+                                                    }
+                                                });
+                                            }
+                                        });
 
                                     }
                                 });

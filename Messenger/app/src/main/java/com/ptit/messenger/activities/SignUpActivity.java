@@ -43,6 +43,7 @@ public class SignUpActivity extends AppCompatActivity {
     private ImageView profileImage;
     private Uri selectedImage;
     private ProgressDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent,45);
+                startActivityForResult(intent, 45);
             }
         });
 
@@ -84,34 +85,34 @@ public class SignUpActivity extends AppCompatActivity {
                 if (email.isEmpty() || password.isEmpty() || name.isEmpty()) {
                     return;
                 } else {
-                    if (selectedImage != null){
+                    if (selectedImage != null) {
                         dialog.show();
-                        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()){
+                                if (task.isSuccessful()) {
                                     String currentId = mAuth.getCurrentUser().getUid();
                                     StorageReference reference = storage.getReference().child("Profiles").child(currentId);
                                     reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                            if (task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                     @Override
                                                     public void onSuccess(Uri uri) {
                                                         String imageUrl = uri.toString();
-                                                        User user = new User(currentId,name,address,phone,imageUrl);
+                                                        User user = new User(currentId, name, address, phone, imageUrl);
                                                         db.getReference().child("Users").child(currentId).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void unused) {
                                                                 dialog.dismiss();
-                                                                startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+                                                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                                                                 finish();
                                                             }
                                                         }).addOnFailureListener(new OnFailureListener() {
                                                             @Override
                                                             public void onFailure(@NonNull Exception e) {
-                                                                Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                                                             }
                                                         });
                                                     }
@@ -122,25 +123,25 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                             }
                         });
-                    }else {
+                    } else {
                         dialog.show();
-                        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()){
+                                if (task.isSuccessful()) {
                                     String currentId = mAuth.getCurrentUser().getUid();
-                                    User user = new User(currentId,name,address,phone,"");
+                                    User user = new User(currentId, name, address, phone, "");
                                     db.getReference().child("Users").child(currentId).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             dialog.dismiss();
-                                            startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+                                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                                             finish();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
@@ -159,8 +160,8 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (data != null){
-            if (data.getData() != null){
+        if (data != null) {
+            if (data.getData() != null) {
                 profileImage.setImageURI(data.getData());
                 selectedImage = data.getData();
             }

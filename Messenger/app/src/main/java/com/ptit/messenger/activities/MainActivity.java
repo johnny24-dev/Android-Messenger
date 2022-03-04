@@ -2,6 +2,7 @@ package com.ptit.messenger.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +15,8 @@ import com.ptit.messenger.R;
 import com.ptit.messenger.activities.adapters.UsersAdapter;
 import com.ptit.messenger.activities.model.User;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<User> users;
     UsersAdapter usersAdapter;
     RecyclerView recyclerView;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mAth = FirebaseAuth.getInstance();
         recyclerView = findViewById(R.id.recyclerview);
         users = new ArrayList<>();
-        usersAdapter = new UsersAdapter(this,users);
+        usersAdapter = new UsersAdapter(this, users);
         recyclerView.setAdapter(usersAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -46,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
-                for (DataSnapshot snapshot1: snapshot.getChildren()){
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-                    if (!user.getUid().equals(mAth.getUid())){
+                    if (!user.getUid().equals(mAth.getUid())) {
                         users.add(user);
                     }
                 }
@@ -65,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.iconSearch:
-                Toast.makeText(getApplicationContext(),"Search",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Search", Toast.LENGTH_LONG).show();
                 break;
         }
         return onOptionsItemSelected(item);
@@ -75,7 +79,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.topmenu,menu);
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.topmenu, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.iconSearch).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                usersAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                usersAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        return true;
     }
 }
